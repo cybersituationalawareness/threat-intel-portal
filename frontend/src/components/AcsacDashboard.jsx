@@ -206,9 +206,11 @@ function AcsacDashboard() {
             <button className="submit-btn" onClick={handleExportCsv} style={{ padding: '8px 16px', fontSize: '14px', backgroundColor: 'transparent', border: '1px solid var(--border-color)' }}>
               Export CSV
             </button>
-            <button className="submit-btn" onClick={handleSyncOG} disabled={syncing} style={{ padding: '8px 16px', fontSize: '14px', backgroundColor: 'transparent', border: '1px solid var(--border-color)' }}>
-              {syncing ? 'Syncing...' : 'Sync from OG'}
-            </button>
+            {currentUser?.role === 'admin' && (
+              <button className="submit-btn" onClick={handleSyncOG} disabled={syncing} style={{ padding: '8px 16px', fontSize: '14px', backgroundColor: 'transparent', border: '1px solid var(--border-color)' }}>
+                {syncing ? 'Syncing...' : 'Sync from OG'}
+              </button>
+            )}
             <button className="submit-btn" onClick={() => { setEditingIntel(null); setShowIntelForm(true); }} style={{ padding: '8px 16px', fontSize: '14px' }}>
               + CREATE ALERT OR ADVISORY
             </button>
