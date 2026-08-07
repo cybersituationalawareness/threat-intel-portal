@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://intel_user:intel_pass@db:5432/threat_intel_db
-      GATHER_API_KEY: "eTFFa1A5Nmo3SUtOZGgzdU96bVNjOHNXVWF5OVJUbi9nR2l4U1NIZVoxbz05SjA1djNvb05FSEJGYis0OVpLSlhpSjQ5Q1ZiQkdkdmxVZWhLUERxTUhNcg=="
+      GATHER_API_KEY: ""
     ports:
       - "8000:8000"        # Exposed for direct curl/test_api.py access from host
     networks:
