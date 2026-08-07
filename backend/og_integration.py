@@ -82,10 +82,12 @@ def gather_search_cases():
     url = "https://gather.gov.sg/cms/api/cases/search"
     all_cases = []
     page = 1
-    size = 50
+    size = 10
     
     while True:
         payload = {
+            "statuses" : ["Open"]
+            "types" : ["test_ncsc_alert"]
             "order": "desc",
             "sort": "caseRef",
             "page": page,
