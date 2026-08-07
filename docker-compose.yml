@@ -1,0 +1,63 @@
+version: '3.9'
+
+# ── Isolated bridge network — all services communicate over this network ──────
+networks:
+  intel-net:
+    driver: bridge
+
+# ── Persistent volume for PostgreSQL data ──────────────────────────────────────
+volumes:
+  postgres_data:
+
+services:
+
+  # ── Database: PostgreSQL 15 Alpine ──────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: threat_intel_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: intel_user
+      POSTGRES_PASSWORD: intel_pass
+      POSTGRES_DB: threat_intel_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - intel-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U intel_user -d threat_intel_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Backend: FastAPI (Python 3.11) ──────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: threat_intel_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://intel_user:intel_pass@db:5432/threat_intel_db
+      GATHER_API_KEY: "eTFFa1A5Nmo3SUtOZGgzdU96bVNjOHNXVWF5OVJUbi9nR2l4U1NIZVoxbz05SjA1djNvb05FSEJGYis0OVpLSlhpSjQ5Q1ZiQkdkdmxVZWhLUERxTUhNcg=="
+    ports:
+      - "8000:8000"        # Exposed for direct curl/test_api.py access from host
+    networks:
+      - intel-net
+    depends_on:
+      db:
+        condition: service_healthy   # Backend only starts after pg_isready passes
+
+  # ── Frontend: React SPA served via Nginx ────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: threat_intel_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"          # Access the UI at http://localhost:3000
+    networks:
+      - intel-net
+    depends_on:
+      - backend
