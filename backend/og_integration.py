@@ -142,12 +142,27 @@ def gather_download_case_attachment(case_uuid, attachment_uuid, save_filename):
     except Exception as e:
         return False
 
-def interpret_email_with_ollama(email_details):
+def call_gemini(prompt):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY environment variable is not set.")
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}]
+    }
+    
+    response = requests.post(url, headers=headers, json=payload, timeout=30)
+    if response.status_code == 200:
+        data = response.json()
+        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+    else:
+        raise Exception(f"Gemini API Error: {response.status_code} - {response.text}")
+
+def interpret_email_with_gemini(email_details):
     if not email_details:
         return "No details provided."
-
-    # Use host.docker.internal to reach the host machine from inside the docker container
-    url = "http://host.docker.internal:11434/api/generate"
 
     prompt = f"""You are a strict Cyber Threat Intelligence parser.
        Analyze the following alert details and extract the key points.
@@ -169,23 +184,16 @@ def interpret_email_with_ollama(email_details):
        **Required actions:**
        * [Point 1]"""
 
-    payload = {"model": "llama3:8b", "prompt": prompt, "stream": False}
-
     try:
-        response = requests.post(url, json=payload, timeout=30)
-        if response.status_code == 200:
-            return response.json().get("response", "").strip()
-        else:
-            return f"[Ollama Error] Could not parse. Raw details: {email_details[:200]}..."
+        return call_gemini(prompt)
     except Exception as e:
-        print(f"[Ollama Error]: {e}")
-        return f"Failed to connect to local Ollama. Raw details: {email_details[:200]}..."
+        print(f"[Gemini Error]: {e}")
+        return f"Failed to connect to Gemini API. Raw details: {email_details[:200]}..."
 
-def extract_sla_with_ollama(email_details):
+def extract_sla_with_gemini(email_details):
     if not email_details:
         return {"has_sla": False, "sla_value": 0, "sla_unit": "day"}
 
-    url = "http://host.docker.internal:11434/api/generate"
     prompt = f"""You are an assistant analyzing cyber threat intelligence emails.
 Analyze the following email details and determine if there is a Service Level Agreement (SLA) or a required timeframe for action mentioned (e.g. "...within one (1) month...", "within 2 days").
 If an SLA is mentioned, extract the numeric value and the unit (must be one of: 'day', 'week', 'month').
@@ -197,37 +205,31 @@ Email Details:
 {email_details}
 ---
 """
-    payload = {"model": "llama3:8b", "prompt": prompt, "stream": False}
-
     try:
-        response = requests.post(url, json=payload, timeout=30)
-        if response.status_code == 200:
-            text = response.json().get("response", "").strip()
-            match = re.search(r'\{.*\}', text, re.DOTALL)
-            if match:
-                try:
-                    data = json.loads(match.group(0))
-                    has_sla = bool(data.get("has_sla", False))
-                    sla_value = int(data.get("sla_value", 0))
-                    sla_unit = str(data.get("sla_unit", "day")).lower()
-                    # Normalise plural units like 'months' or 'days' to singular
-                    if sla_unit.endswith('s'):
-                        sla_unit = sla_unit[:-1]
-                    if sla_unit not in ["day", "week", "month"]:
-                        sla_unit = "day"
-                    return {"has_sla": has_sla, "sla_value": sla_value, "sla_unit": sla_unit}
-                except (json.JSONDecodeError, ValueError):
-                    pass
+        text = call_gemini(prompt)
+        match = re.search(r'\{.*\}', text, re.DOTALL)
+        if match:
+            try:
+                data = json.loads(match.group(0))
+                has_sla = bool(data.get("has_sla", False))
+                sla_value = int(data.get("sla_value", 0))
+                sla_unit = str(data.get("sla_unit", "day")).lower()
+                if sla_unit.endswith('s'):
+                    sla_unit = sla_unit[:-1]
+                if sla_unit not in ["day", "week", "month"]:
+                    sla_unit = "day"
+                return {"has_sla": has_sla, "sla_value": sla_value, "sla_unit": sla_unit}
+            except (json.JSONDecodeError, ValueError):
+                pass
     except Exception as e:
-        print(f"[Ollama SLA Error]: {e}")
+        print(f"[Gemini SLA Error]: {e}")
 
     return {"has_sla": False, "sla_value": 0, "sla_unit": "day"}
 
-def categorize_email_with_ollama(email_details):
+def categorize_email_with_gemini(email_details):
     if not email_details:
         return "General Threat Intelligence"
 
-    url = "http://host.docker.internal:11434/api/generate"
     prompt = f"""You are an expert Cyber Threat Intelligence analyst.
 Analyze the following email details and categorize the alert or advisory into ONE most appropriate category from the following examples (or a similar concise category):
 - Exploited Vulnerabilities
@@ -245,19 +247,15 @@ Email Details:
 {email_details}
 ---
 """
-    payload = {"model": "llama3:8b", "prompt": prompt, "stream": False}
-
     try:
-        response = requests.post(url, json=payload, timeout=30)
-        if response.status_code == 200:
-            category = response.json().get("response", "").strip()
-            category = category.replace('"', '').replace("'", "").replace('**', '').strip()
-            category = category.split('\n')[0].strip()
-            if len(category) > 50 or not category:
-                return "General Threat Intelligence"
-            return category
+        category = call_gemini(prompt)
+        category = category.replace('"', '').replace("'", "").replace('**', '').strip()
+        category = category.split('\n')[0].strip()
+        if len(category) > 50 or not category:
+            return "General Threat Intelligence"
+        return category
     except Exception as e:
-        print(f"[Ollama Categorize Error]: {e}")
+        print(f"[Gemini Categorize Error]: {e}")
 
     return "General Threat Intelligence"
 
@@ -317,11 +315,11 @@ def sync_latest_intel_from_og(existing_case_ids=None):
 
 
         tlp_color = extract_tlp_color(email_details)
-        sla_data = extract_sla_with_ollama(email_details)
-        category = categorize_email_with_ollama(email_details)
+        sla_data = extract_sla_with_gemini(email_details)
+        category = categorize_email_with_gemini(email_details)
         
-        # Parse description with Ollama and fix clustered formatting
-        description = interpret_email_with_ollama(email_details)
+        # Parse description with Gemini and fix clustered formatting
+        description = interpret_email_with_gemini(email_details)
         # Convert bullet points from '* ' to '- '
         description = re.sub(r'(?<!\*)\* ', '\n- ', description)
         description = re.sub(r'(\*\*[^*]+\*\*)', r'\n\n\1\n', description)
