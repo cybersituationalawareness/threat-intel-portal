@@ -206,7 +206,7 @@ function AcsacDashboard() {
             <button className="submit-btn" onClick={handleExportCsv} style={{ padding: '8px 16px', fontSize: '14px', backgroundColor: 'transparent', border: '1px solid var(--border-color)' }}>
               Export CSV
             </button>
-            {currentUser?.role === 'admin' && (
+            {currentUser?.role === 'ADMIN' && (
               <button className="submit-btn" onClick={handleSyncOG} disabled={syncing} style={{ padding: '8px 16px', fontSize: '14px', backgroundColor: 'transparent', border: '1px solid var(--border-color)' }}>
                 {syncing ? 'Syncing...' : 'Sync from OG'}
               </button>
