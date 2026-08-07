@@ -86,8 +86,8 @@ def gather_search_cases():
     
     while True:
         payload = {
-            "statuses" : ["Open"]
-            "types" : ["test_ncsc_alert"]
+            "statuses" : ["Open"],
+            "types" : ["test_ncsc_alert"],
             "order": "desc",
             "sort": "caseRef",
             "page": page,
