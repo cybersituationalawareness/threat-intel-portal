@@ -81,6 +81,9 @@ function MainLayout() {
       ) : (
         <IsacDashboard />
       )}
+      <div style={{ textAlign: 'center', padding: '15px', color: 'var(--text-dim)', fontSize: '12px', borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-glass)' }}>
+        Created by <a href="https://www.linkedin.com/in/weicheng-alan-ong-cissp-cism-gmle-gcfa-gcih-gcti-73435298" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Ong Weicheng Alan</a>
+      </div>
     </div>
   );
 }

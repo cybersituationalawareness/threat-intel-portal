@@ -80,6 +80,10 @@ function Login() {
           {loading ? 'Logging in...' : 'Log In'}
         </button>
       </form>
+
+      <div style={{ position: 'absolute', bottom: '30px', fontSize: '13px', color: 'var(--text-dim)' }}>
+        Created by <a href="https://www.linkedin.com/in/weicheng-alan-ong-cissp-cism-gmle-gcfa-gcih-gcti-73435298" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Ong Weicheng Alan</a>
+      </div>
     </div>
   );
 }

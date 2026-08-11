@@ -1,5 +1,7 @@
 # ACSAC Threat Intel Portal
 
+**Created by [Ong Weicheng Alan](https://www.linkedin.com/in/weicheng-alan-ong-cissp-cism-gmle-gcfa-gcih-gcti-73435298)**
+
 A centralized platform designed for the Aviation Cyber Security Advisory Center (ACSAC) to manage threat intelligence, coordinate incident reporting, and facilitate Information Sharing and Analysis Center (ISAC) insights among member organizations.
 
 ## Features
@@ -67,4 +69,4 @@ The database is automatically seeded with test data upon initialization. You can
 
 ## License
 
-This project is proprietary and confidential.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
