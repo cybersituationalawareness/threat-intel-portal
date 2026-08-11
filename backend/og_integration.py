@@ -230,17 +230,16 @@ Email Details:
 
 def categorize_email_with_gemini(email_details):
     if not email_details:
-        return "General Threat Intelligence"
+        return "Other"
 
     prompt = f"""You are an expert Cyber Threat Intelligence analyst.
 Analyze the following email details and categorize the alert or advisory into ONE most appropriate category from the following examples (or a similar concise category):
 - Exploited Vulnerabilities
 - Indicators of Compromise
-- Situational Awareness Report
-- Malware & Ransomware
-- Phishing & Social Engineering
-- Security Patch / Advisory
-- General Threat Intelligence
+- Campaign
+- Threat Hunt Package
+- RFI
+- Other
 
 Respond ONLY with the category name (e.g. Exploited Vulnerabilities) without any punctuation, markdown, prefix, explanation, or quotes.
 
