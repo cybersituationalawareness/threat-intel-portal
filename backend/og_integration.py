@@ -153,11 +153,11 @@ def call_gemini(prompt):
     
     try:
         client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
+        interaction = client.interactions.create(
             model='gemini-2.5-flash',
-            contents=prompt,
+            input=prompt,
         )
-        return response.text.strip()
+        return interaction.output_text.strip()
     except Exception as e:
         raise Exception(f"Gemini API Error: {e}")
 
