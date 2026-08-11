@@ -144,23 +144,22 @@ def gather_download_case_attachment(case_uuid, attachment_uuid, save_filename):
     except Exception as e:
         return False
 
+from google import genai
+
 def call_gemini(prompt):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable is not set.")
     
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
-    headers = {"Content-Type": "application/json"}
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}]
-    }
-    
-    response = requests.post(url, headers=headers, json=payload, timeout=30)
-    if response.status_code == 200:
-        data = response.json()
-        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
-    else:
-        raise Exception(f"Gemini API Error: {response.status_code} - {response.text}")
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+        )
+        return response.text.strip()
+    except Exception as e:
+        raise Exception(f"Gemini API Error: {e}")
 
 def interpret_email_with_gemini(email_details):
     if not email_details:
