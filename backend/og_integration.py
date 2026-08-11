@@ -253,12 +253,12 @@ Email Details:
         category = category.replace('"', '').replace("'", "").replace('**', '').strip()
         category = category.split('\n')[0].strip()
         if len(category) > 50 or not category:
-            return "General Threat Intelligence"
+            return "Other"
         return category
     except Exception as e:
         print(f"[Gemini Categorize Error]: {e}")
 
-    return "General Threat Intelligence"
+    return "Other"
 
 def sync_latest_intel_from_og(existing_case_ids=None):
     """
