@@ -1,0 +1,6 @@
+{
+  "framework": "container",
+  "handle": "acsac/acsac",
+  "port": 8080,
+  "instanceType": "nano"
+}

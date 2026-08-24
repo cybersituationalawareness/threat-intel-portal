@@ -61,6 +61,19 @@ The database is automatically seeded with test data upon initialization. You can
 
 *(Note: There is no password required for local development; selecting the email from the login dropdown handles authentication.)*
 
+## Deploying to GovTech Airbase
+
+This project is configured to be deployed as a unified Docker container to GovTech Airbase V2 (Government Commercial Cloud).
+
+### Deployment Steps:
+
+1. Connect your repository to Airbase.
+2. Select the provided `Dockerfile` at the root of the project.
+3. Configure the following environment variables in Airbase:
+   - `DATABASE_URL`: Connection string to your PostgreSQL instance (ensure IP ranges are whitelisted or use a transaction pooler).
+   - `GEMINI_API_KEY`: API key for Gemini integration.
+   - `GATHER_API_KEY`: API key for Gather integration.
+
 ## Architecture
 
 - `backend/`: Contains the FastAPI application, database models (`models.py`), Pydantic schemas (`schemas.py`), and API endpoints (`main.py`). The database is seeded on startup via the lifespan context manager.

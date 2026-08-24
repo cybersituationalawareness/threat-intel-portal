@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import './IncidentReportingModal.css';
+import IncidentFormSection1 from './IncidentFormSection1';
+import IncidentFormSection2 from './IncidentFormSection2';
+import IncidentFormSection3 from './IncidentFormSection3';
+import IncidentFormSection4 from './IncidentFormSection4';
+import IncidentFormSection5 from './IncidentFormSection5';
+import IncidentFormSection6 from './IncidentFormSection6';
+import IncidentFormSection7 from './IncidentFormSection7';
+
 
 const getLocalCurrentDateTime = () => {
   const now = new Date();
@@ -868,17 +876,45 @@ function IncidentReportingModal({ isOpen, onClose, onSuccess, existingIncident, 
           {errorMsg && <div className="error-alert">{errorMsg}</div>}
           
           <fieldset disabled={readOnly} style={{ border: 'none', padding: 0, margin: 0, minWidth: 0 }}>
-            {currentStep === 1 && renderSection1()}
+            {currentStep === 1 && <IncidentFormSection1 formData={formData} handleChange={handleChange} memberOrgs={memberOrgs} />}
             {currentStep === 2 && (
               <>
-                {renderSection2()}
-                {renderSection3()}
+                <IncidentFormSection2 formData={formData} handleChange={handleChange} handleCheckboxGroup={handleCheckboxGroup} />
+                <IncidentFormSection3 
+                  formData={formData} 
+                  handleCIIChange={handleCIIChange} 
+                  removeCII={removeCII} 
+                  addCII={addCII} 
+                  dragActive={dragActive}
+                  handleDrag={handleDrag}
+                  handleDrop={handleDrop}
+                  handleFileChange={handleFileChange}
+                  attachments={attachments}
+                  removeAttachment={removeAttachment}
+                />
               </>
             )}
-            {currentStep === 3 && renderSection4()}
-            {currentStep === 4 && renderSection5()}
-            {currentStep === 5 && renderSection6()}
-            {currentStep === 6 && renderSection7()}
+            {currentStep === 3 && <IncidentFormSection4 formData={formData} handleChange={handleChange} />}
+            {currentStep === 4 && <IncidentFormSection5 formData={formData} handleChange={handleChange} />}
+            {currentStep === 5 && (
+              <IncidentFormSection6 
+                formData={formData} 
+                handleDynamicInfoChange={handleDynamicInfoChange} 
+                removeDynamicInfo={removeDynamicInfo} 
+                addDynamicInfo={addDynamicInfo}
+                existingAttachments={existingAttachments}
+                existingIncident={existingIncident}
+                handleDeleteExistingAttachment={handleDeleteExistingAttachment}
+                readOnly={readOnly}
+                dragActive={dragActive}
+                handleDrag={handleDrag}
+                handleDrop={handleDrop}
+                handleFileChange={handleFileChange}
+                attachments={attachments}
+                removeAttachment={removeAttachment}
+              />
+            )}
+            {currentStep === 6 && <IncidentFormSection7 formData={formData} handleChange={handleChange} validateMandatory={() => validateMandatory(false)} />}
           </fieldset>
           
           {/* Clarification Thread Section */}

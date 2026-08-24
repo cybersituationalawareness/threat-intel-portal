@@ -14,6 +14,10 @@ Phase 2 upgrade path:
   - Move credentials to a secrets manager (e.g. HashiCorp Vault, GCP Secret Manager).
 """
 import os
+from dotenv import load_dotenv
+
+load_dotenv(os.path.join(os.path.dirname(__file__), "../.env"))
+load_dotenv() # Fallback for when it's copied into the same directory
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker

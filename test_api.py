@@ -8,7 +8,7 @@ def test_health():
     max_retries = 30
     for i in range(max_retries):
         try:
-            res = requests.get("http://localhost:8000/")
+            res = requests.get("http://localhost:8000/api/health")
             if res.status_code == 200:
                 print("[+] Backend is UP!\n")
                 return True
@@ -29,7 +29,7 @@ def test_full_workflow():
     
     users = res.json()
     acsac_admin = next(u for u in users if u['organization']['org_type'] == 'ACSAC')
-    member_a = next(u for u in users if u['organization']['name'] == 'Global Airlines')
+    member_a = next(u for u in users if u['organization']['name'] == 'Sector Member1')
 
     print(f"[+] Found ACSAC Admin: {acsac_admin['name']}")
     print(f"[+] Found Member A: {member_a['name']}")
@@ -39,15 +39,15 @@ def test_full_workflow():
     payload = {
         "type": "Alert",
         "title": "Critical RCE in Edge Gateway",
-        "summary": "Unauthenticated RCE vulnerability actively exploited.",
-        "detailed_description": "A zero-day RCE exists in Edge Gateway.",
+        "case_id": "TEST-2026-0001",
+        "description": "A zero-day RCE exists in Edge Gateway.",
+        "threat_data": "Exploit payload observed in wild.",
         "tlp": "Red",
         "severity": "Critical",
         "confidence": "High",
-        "sector_relevance": ["Aviation"],
         "tags": ["Zero-day"],
-        "recommended_actions": ["Isolate Gateway"],
-        "classification": "sector-wide"
+        "classification": "sector-wide",
+        "category": "Exploited Vulnerabilities"
     }
 
     res = requests.post(f"{API_URL}/intel", json=payload, headers={"X-User-ID": acsac_admin['id']})

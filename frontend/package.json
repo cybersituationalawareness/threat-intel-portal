@@ -1,7 +1,6 @@
 {
   "name": "threat-intel-portal",
   "version": "1.0.0",
-  "homepage": "https://cybersituationalawareness.github.io/threat-intel-portal",
   "private": true,
   "dependencies": {
     "react": "^18.3.1",
