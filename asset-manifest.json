@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/threat-intel-portal/static/css/main.dbe39dfe.css",
-    "main.js": "/threat-intel-portal/static/js/main.70b05a3b.js",
+    "main.js": "/threat-intel-portal/static/js/main.c92a8d79.js",
     "index.html": "/threat-intel-portal/index.html",
     "main.dbe39dfe.css.map": "/threat-intel-portal/static/css/main.dbe39dfe.css.map",
-    "main.70b05a3b.js.map": "/threat-intel-portal/static/js/main.70b05a3b.js.map"
+    "main.c92a8d79.js.map": "/threat-intel-portal/static/js/main.c92a8d79.js.map"
   },
   "entrypoints": [
     "static/css/main.dbe39dfe.css",
-    "static/js/main.70b05a3b.js"
+    "static/js/main.c92a8d79.js"
   ]
 }
