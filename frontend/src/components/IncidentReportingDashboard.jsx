@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import IncidentReportingModal from './IncidentReportingModal';
+import Pagination from './Pagination';
 
 function IncidentReportingDashboard() {
   const { authFetch, currentUser } = useAuth();
@@ -13,6 +14,12 @@ function IncidentReportingDashboard() {
   const [incidentToEdit, setIncidentToEdit] = useState(null);
   const [isReadOnly, setIsReadOnly] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, columnFilters, incidents]);
 
   const handleOpenForm = () => {
     setIncidentToEdit(null);
@@ -54,6 +61,9 @@ function IncidentReportingDashboard() {
     if (filter === 'all') return true;
     return s.status === filter;
   });
+
+  const totalPages = Math.ceil(filteredIncidents.length / ITEMS_PER_PAGE);
+  const paginatedIncidents = filteredIncidents.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const handleStatusChange = async (incidentId, newStatus) => {
     try {
@@ -276,7 +286,7 @@ function IncidentReportingDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {filteredIncidents.map(inc => (
+                {paginatedIncidents.map(inc => (
                   <tr 
                     key={inc.id}
                     onClick={() => { 
@@ -313,6 +323,9 @@ function IncidentReportingDashboard() {
             </table>
           )}
         </div>
+        {!loading && filteredIncidents.length > 0 && (
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+        )}
       </div>
 
             {/* Slide-Out Side Drawer is now handled by IncidentReportingModal */}

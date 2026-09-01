@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Pagination from './Pagination';
 
 const TLP_MAP = {
   'Red':         { label: 'TLP:RED',          background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' },
@@ -18,6 +19,15 @@ function IsacFeedTable({
   setSelectedSubmission,
   setShowForm
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [columnFilters, submissions]);
+
+  const totalPages = Math.ceil(filteredSubmissions.length / ITEMS_PER_PAGE);
+  const paginatedSubmissions = filteredSubmissions.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
   if (loading) {
     return <div style={{ padding: '20px' }}>Loading feed...</div>;
   }
@@ -27,6 +37,7 @@ function IsacFeedTable({
   }
 
   return (
+    <>
     <table className="intel-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
       <thead>
         <tr style={{ borderBottom: "none", backgroundColor: "var(--bg-glass)" }}>
@@ -251,7 +262,7 @@ function IsacFeedTable({
         </tr>
       </thead>
       <tbody>
-        {filteredSubmissions.map(sub => {
+        {paginatedSubmissions.map(sub => {
           const tlpInfo = TLP_MAP[sub.tlp] || { label: sub.tlp || '-', background: 'rgba(255,255,255,0.1)', color: 'var(--text-color)', border: '1px solid var(--border-color)' };
           return (
             <tr 
@@ -306,6 +317,10 @@ function IsacFeedTable({
         })}
       </tbody>
     </table>
+    {filteredSubmissions.length > 0 && (
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+    )}
+    </>
   );
 }
 

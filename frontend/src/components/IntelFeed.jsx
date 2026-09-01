@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import IntelRow from './IntelCard'; // reusing the file but exporting as IntelRow in concept
+import React, { useState, useEffect } from 'react';
+import IntelRow from './IntelCard';
+import Pagination from './Pagination';
 
 /**
  * IntelFeed
@@ -11,6 +12,13 @@ function IntelFeed({ intels, loading, filter, onFilterChange, onIntelSelect, sel
   const [searchQuery, setSearchQuery] = useState('');
   const [columnFilters, setColumnFilters] = useState({});
   const handleColumnFilter = (key, value) => setColumnFilters(prev => ({...prev, [key]: value}));
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filter, columnFilters, intels]);
 
   const displayedIntels = intels.filter(intel => {
     if (!searchQuery) return true;
@@ -32,6 +40,9 @@ function IntelFeed({ intels, loading, filter, onFilterChange, onIntelSelect, sel
     { key: 'Alert',    label: 'Alerts Only' },
     { key: 'Advisory', label: 'Advisories Only' },
   ];
+
+  const totalPages = Math.ceil(displayedIntels.length / ITEMS_PER_PAGE);
+  const paginatedIntels = displayedIntels.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <section className="feed-panel" aria-label="Active Intel Feed">
@@ -477,7 +488,7 @@ function IntelFeed({ intels, loading, filter, onFilterChange, onIntelSelect, sel
               </tr>
             </thead>
             <tbody>
-              {displayedIntels.map((intel) => (
+              {paginatedIntels.map((intel) => (
                 <IntelRow 
                   key={intel.id} 
                   intel={intel} 
@@ -495,6 +506,9 @@ function IntelFeed({ intels, loading, filter, onFilterChange, onIntelSelect, sel
           </table>
         )}
       </div>
+      {!loading && displayedIntels.length > 0 && (
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+      )}
     </section>
   );
 }

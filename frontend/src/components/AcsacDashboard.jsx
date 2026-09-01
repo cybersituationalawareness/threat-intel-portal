@@ -27,7 +27,18 @@ function AcsacDashboard() {
           setIntels(data);
         }
         
+        // Handle deep linking
+        const params = new URLSearchParams(window.location.search);
+        const deepLinkId = params.get('intel_id');
+
         setSelectedIntel(prev => {
+          if (deepLinkId && !prev) {
+            const linkedIntel = data.find(i => i.id === deepLinkId || i.case_id === deepLinkId);
+            if (linkedIntel) {
+              window.history.replaceState({}, document.title, window.location.pathname);
+              return linkedIntel;
+            }
+          }
           if (prev) {
             return data.find(i => i.id === prev.id) || prev;
           }

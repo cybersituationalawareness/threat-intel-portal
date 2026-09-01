@@ -93,7 +93,17 @@ function IsacDashboard() {
       if (!res.ok) throw new Error('Failed to fetch ISAC submissions');
       const data = await res.json();
       setSubmissions(data);
+      const params = new URLSearchParams(window.location.search);
+      const deepLinkId = params.get('isac_id');
+      
       setSelectedSubmission(prev => {
+        if (deepLinkId && !prev) {
+          const linkedSub = data.find(item => item.id === deepLinkId || item.case_id === deepLinkId);
+          if (linkedSub) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return linkedSub;
+          }
+        }
         if (prev) {
           return data.find(item => item.id === prev.id) || prev;
         }

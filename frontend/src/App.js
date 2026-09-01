@@ -15,7 +15,13 @@ const API_BASE = process.env.REACT_APP_API_BASE || '';
 function MainLayout() {
   const { currentUser } = useAuth();
   const isAcsac = currentUser?.organization?.org_type === 'ACSAC';
-  const [activeTab, setActiveTab] = useState(isAcsac ? 'analytics' : 'alerts');
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('intel_id')) return 'alerts';
+    if (params.has('incident_id')) return 'incidents';
+    if (params.has('isac_id')) return 'isac';
+    return isAcsac ? 'analytics' : 'alerts';
+  });
   
   if (!currentUser) {
     return <Login />;
